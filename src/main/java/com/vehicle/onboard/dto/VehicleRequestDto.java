@@ -1,9 +1,6 @@
 package com.vehicle.onboard.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,10 +21,12 @@ public class VehicleRequestDto {
     private String model;
 
     @NotNull(message = "Year is required")
+    @Min(value = 1900, message = "Year must be greater than or equal to 1900")
+    @Max(value = 2100, message = "Year must be less than or equal to 2100")
     private Integer year;
 
     @NotBlank(message = "Registration number is required")
-    @Pattern(regexp = "^[A-Z0-9]{1,10}$", message = "Invalid registration number format")
+    @Pattern(regexp = "^[A-Z]{2}\\d{2}[A-Z]{2}\\d{4}$", message = "Invalid registration number format")
     private String registrationNumber;
 
     @NotBlank(message = "VIN is required")
@@ -35,7 +34,7 @@ public class VehicleRequestDto {
     private String vin;
 
     @NotBlank(message = "Color is required")
-    @Size(max = 30, message = "Color must not exceed 30 characters")
+    @Size(max = 20, message = "Color must not exceed 20 characters")
     private String color;
 
     @Size(max = 500, message = "Description must not exceed 500 characters")

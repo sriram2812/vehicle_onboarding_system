@@ -5,11 +5,11 @@ import com.vehicle.onboard.dto.VehicleResponseDto;
 import com.vehicle.onboard.service.VehicleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/vehicles")
@@ -20,28 +20,24 @@ public class VehicleController {
 
     @PostMapping
     public ResponseEntity<VehicleResponseDto> createVehicle(@Valid @RequestBody VehicleRequestDto requestDto) {
-        VehicleResponseDto responseDto = vehicleService.createVehicle(requestDto);
-        return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
+        return new ResponseEntity<>(vehicleService.createVehicle(requestDto), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<VehicleResponseDto> getVehicleById(@PathVariable Long id) {
-        VehicleResponseDto responseDto = vehicleService.getVehicleById(id);
-        return ResponseEntity.ok(responseDto);
+        return ResponseEntity.ok(vehicleService.getVehicleById(id));
     }
 
     @GetMapping
-    public ResponseEntity<List<VehicleResponseDto>> getAllActiveVehicles() {
-        List<VehicleResponseDto> vehicles = vehicleService.getAllActiveVehicles();
-        return ResponseEntity.ok(vehicles);
+    public ResponseEntity<Page<VehicleResponseDto>> getAllVehicles(Pageable pageable) {
+        return ResponseEntity.ok(vehicleService.getAllVehicles(pageable));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<VehicleResponseDto> updateVehicle(
             @PathVariable Long id,
             @Valid @RequestBody VehicleRequestDto requestDto) {
-        VehicleResponseDto responseDto = vehicleService.updateVehicle(id, requestDto);
-        return ResponseEntity.ok(responseDto);
+        return ResponseEntity.ok(vehicleService.updateVehicle(id, requestDto));
     }
 
     @DeleteMapping("/{id}")

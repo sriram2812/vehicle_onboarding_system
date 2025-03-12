@@ -3,17 +3,16 @@ package com.vehicle.onboard.service.impl;
 import com.vehicle.onboard.dto.VehicleRequestDto;
 import com.vehicle.onboard.dto.VehicleResponseDto;
 import com.vehicle.onboard.entity.Vehicle;
-import com.vehicle.onboard.exception.DuplicateResourceException;
 import com.vehicle.onboard.exception.ResourceNotFoundException;
 import com.vehicle.onboard.mapper.VehicleMapper;
 import com.vehicle.onboard.repository.VehicleRepository;
 import com.vehicle.onboard.service.VehicleService;
 import com.vehicle.onboard.service.validation.VehicleValidationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -27,51 +26,42 @@ public class VehicleServiceImpl implements VehicleService {
     @Transactional
     public VehicleResponseDto createVehicle(VehicleRequestDto requestDto) {
         validationService.validateNewVehicle(requestDto);
-        
         Vehicle vehicle = vehicleMapper.toEntity(requestDto);
-        vehicle = vehicleRepository.save(vehicle);
-        
-        return vehicleMapper.toDto(vehicle);
+        return vehicleMapper.toResponseDto(vehicleRepository.save(vehicle));
     }
 
     @Override
     @Transactional(readOnly = true)
     public VehicleResponseDto getVehicleById(Long id) {
-        Vehicle vehicle = vehicleRepository.findByIdAndActiveTrue(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found with id: " + id));
-        
-        return vehicleMapper.toDto(vehicle);
+        return vehicleMapper.toResponseDto(findVehicleById(id));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<VehicleResponseDto> getAllActiveVehicles() {
-        return vehicleRepository.findByActiveTrue().stream()
-                .map(vehicleMapper::toDto)
-                .toList();
+    public Page<VehicleResponseDto> getAllVehicles(Pageable pageable) {
+        return vehicleRepository.findAll(pageable)
+                .map(vehicleMapper::toResponseDto);
     }
 
     @Override
     @Transactional
     public VehicleResponseDto updateVehicle(Long id, VehicleRequestDto requestDto) {
-        Vehicle vehicle = vehicleRepository.findByIdAndActiveTrue(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found with id: " + id));
-        
+        Vehicle vehicle = findVehicleById(id);
         validationService.validateVehicleUpdate(id, requestDto);
-        
-        vehicleMapper.updateEntityFromDto(requestDto, vehicle);
-        vehicle = vehicleRepository.save(vehicle);
-        
-        return vehicleMapper.toDto(vehicle);
+        vehicleMapper.updateEntity(vehicle, requestDto);
+        return vehicleMapper.toResponseDto(vehicleRepository.save(vehicle));
     }
 
     @Override
     @Transactional
     public void deactivateVehicle(Long id) {
-        Vehicle vehicle = vehicleRepository.findByIdAndActiveTrue(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found with id: " + id));
-        
+        Vehicle vehicle = findVehicleById(id);
         vehicle.setActive(false);
         vehicleRepository.save(vehicle);
+    }
+
+    private Vehicle findVehicleById(Long id) {
+        return vehicleRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found with id: " + id));
     }
 }

@@ -5,14 +5,10 @@ import com.vehicle.onboard.dto.VehicleResponseDto;
 import com.vehicle.onboard.entity.Vehicle;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValuePropertyMappingStrategy;
 
-@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+@Mapper(componentModel = "spring")
 public interface VehicleMapper {
-    
     Vehicle toEntity(VehicleRequestDto requestDto);
-    
-    VehicleResponseDto toDto(Vehicle vehicle);
-    
-    void updateEntityFromDto(VehicleRequestDto requestDto, @MappingTarget Vehicle vehicle);
+    VehicleResponseDto toResponseDto(Vehicle vehicle);
+    void updateEntity(@MappingTarget Vehicle vehicle, VehicleRequestDto requestDto);
 }

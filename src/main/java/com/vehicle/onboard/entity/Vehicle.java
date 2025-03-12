@@ -1,20 +1,26 @@
 package com.vehicle.onboard.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "vehicles", uniqueConstraints = {
-    @UniqueConstraint(name = "uk_registration_number_active", columnNames = {"registrationNumber", "active"}),
-    @UniqueConstraint(name = "uk_vin_active", columnNames = {"vin", "active"})
-})
+@Table(
+    name = "vehicles",
+    uniqueConstraints = {
+        @UniqueConstraint(
+            name = "uk_registration_number",
+            columnNames = {"registration_number", "active"}
+        ),
+        @UniqueConstraint(
+            name = "uk_vin",
+            columnNames = {"vin", "active"}
+        )
+    }
+)
 @Data
 @Builder
 @NoArgsConstructor
@@ -34,7 +40,7 @@ public class Vehicle {
     @Column(nullable = false)
     private Integer year;
 
-    @Column(nullable = false)
+    @Column(name = "registration_number", nullable = false)
     private String registrationNumber;
 
     @Column(nullable = false)
@@ -43,18 +49,17 @@ public class Vehicle {
     @Column(nullable = false)
     private String color;
 
-    @Column
     private String description;
 
-    @Column(nullable = false)
     @Builder.Default
-    private boolean active = true;
+    @Column(nullable = false)
+    private Boolean active = true;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    @Column(name = "updated_at")
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 }

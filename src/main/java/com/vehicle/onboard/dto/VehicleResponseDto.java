@@ -20,7 +20,7 @@ public class VehicleResponseDto {
     private String vin;
     private String color;
     private String description;
-    private boolean active;
+    private Boolean active;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
